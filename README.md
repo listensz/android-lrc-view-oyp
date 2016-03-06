@@ -1,9 +1,12 @@
 [TOC]
->版权声明：本文为【欧阳鹏】原创文章，欢迎转载，转载请注明出处! 【http://blog.csdn.net/ouyang_peng】
+
+
+>版权声明：本文为【欧阳鹏】原创文章，欢迎转载，转载请注明出处! 【http://blog.csdn.net/ouyang_peng/article/details/50813419】
 
 
 >作者：欧阳鹏 欢迎转载，与人分享是进步的源泉！ 
-转载请保留原文地址：http://blog.csdn.net/ouyang_peng
+>转载请保留原文地址：
+>http://blog.csdn.net/ouyang_peng/article/details/50813419
      
 ![这里写图片描述](http://img.blog.csdn.net/20150708201910089)
 
@@ -1808,14 +1811,18 @@ public class MainActivity extends Activity {
 下面是项目的结构图。
 ![这里写图片描述](http://img.blog.csdn.net/20160306145252533)
 
+#四、项目源码地址
++ CSDN下载
+项目的源代码可以从下面的地址去免费下载：
+[http://download.csdn.net/detail/qq446282412/9453906](http://download.csdn.net/detail/qq446282412/9453906)
++ Github下载
+[https://github.com/ouyangpeng/android-lrc-view-oyp](https://github.com/ouyangpeng/android-lrc-view-oyp)
 
-项目的源代码可以从下面的地址去免费下载：[http://download.csdn.net/detail/qq446282412/9453906](http://download.csdn.net/detail/qq446282412/9453906)
-
-
->版权声明：本文为【欧阳鹏】原创文章，欢迎转载，转载请注明出处! 【http://blog.csdn.net/ouyang_peng】
+>版权声明：本文为【欧阳鹏】原创文章，欢迎转载，转载请注明出处! 【http://blog.csdn.net/ouyang_peng/article/details/50813419】
 
 
 >作者：欧阳鹏 欢迎转载，与人分享是进步的源泉！ 
-转载请保留原文地址：http://blog.csdn.net/ouyang_peng
+>转载请保留原文地址：
+>http://blog.csdn.net/ouyang_peng/article/details/50813419
      
 ![这里写图片描述](http://img.blog.csdn.net/20150708201910089)
