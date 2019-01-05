@@ -21,5 +21,5 @@ public interface ILrcView {
     /**
      * 设置歌词拖动时候的监听类
      */
-    void setListener(ILrcViewListener l);
+    void setListener(ILrcViewListener listener);
 }

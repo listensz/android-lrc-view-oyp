@@ -24,15 +24,26 @@ public class MainActivity extends Activity {
 
 	public final static String TAG = "MainActivity";
 
-    //自定义LrcView，用来展示歌词
+    /**
+     * 自定义LrcView，用来展示歌词
+     */
 	ILrcView mLrcView;
-    //更新歌词的频率，每秒更新一次
-    private int mPalyTimerDuration = 1000;
-    //更新歌词的定时器
+    /**
+     *更新歌词的频率，每秒更新一次
+     */
+    private int mPlayerTimerDuration = 1000;
+    /**
+     *更新歌词的定时器
+     */
     private Timer mTimer;
-    //更新歌词的定时任务
+    /**
+     *更新歌词的定时任务
+     */
     private TimerTask mTask;
-
+    /**
+     *播放器
+     */
+    private MediaPlayer mPlayer;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +66,9 @@ public class MainActivity extends Activity {
         //设置自定义的LrcView上下拖动歌词时监听
         mLrcView.setListener(new ILrcViewListener() {
             //当歌词被用户上下拖动的时候回调该方法,从高亮的那一句歌词开始播放
-            public void onLrcSeeked(int newPosition, LrcRow row) {
+            public void onLrcSought(int newPosition, LrcRow row) {
                 if (mPlayer != null) {
-                    Log.d(TAG, "onLrcSeeked:" + row.time);
+                    Log.d(TAG, "onLrcSought:" + row.time);
                     mPlayer.seekTo((int) row.time);
                 }
             }
@@ -95,7 +106,7 @@ public class MainActivity extends Activity {
         return "";
     }
 
-    MediaPlayer mPlayer;
+
 
     /**
      * 开始播放歌曲并同步展示歌词
@@ -112,7 +123,7 @@ public class MainActivity extends Activity {
 			        if(mTimer == null){
 			        	mTimer = new Timer();
 			        	mTask = new LrcTask();
-			        	mTimer.scheduleAtFixedRate(mTask, 0, mPalyTimerDuration);
+			        	mTimer.scheduleAtFixedRate(mTask, 0, mPlayerTimerDuration);
 			        }
 				}
 			});
