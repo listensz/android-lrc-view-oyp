@@ -29,9 +29,9 @@ public class MainActivity extends Activity {
      */
 	ILrcView mLrcView;
     /**
-     *更新歌词的频率，每秒更新一次
+     *更新歌词的频率，每100ms更新一次
      */
-    private int mPlayerTimerDuration = 1000;
+    private int mPlayerTimerDuration = 100;
     /**
      *更新歌词的定时器
      */
@@ -68,8 +68,8 @@ public class MainActivity extends Activity {
             //当歌词被用户上下拖动的时候回调该方法,从高亮的那一句歌词开始播放
             public void onLrcSought(int newPosition, LrcRow row) {
                 if (mPlayer != null) {
-                    Log.d(TAG, "onLrcSought:" + row.time);
-                    mPlayer.seekTo((int) row.time);
+                    Log.d(TAG, "onLrcSought:" + row.startTime);
+                    mPlayer.seekTo((int) row.startTime);
                 }
             }
         });

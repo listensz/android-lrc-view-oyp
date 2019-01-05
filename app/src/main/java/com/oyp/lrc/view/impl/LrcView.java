@@ -1,6 +1,7 @@
 package com.oyp.lrc.view.impl;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -86,7 +87,7 @@ public class LrcView extends View implements ILrcView {
     /**
      * 歌词字体大小默认值
      **/
-    private int mLrcFontSize = 23;    // font size of lrc
+    private int mLrcFontSize = 35;    // font size of lrc
     /**
      * 歌词字体大小最小值
      **/
@@ -116,6 +117,26 @@ public class LrcView extends View implements ILrcView {
     private String mLoadingLrcTip = "Downloading lrc...";
 
     private Paint mPaint;
+
+    /**
+     * 当前播放的时间
+     */
+    long currentMillis;
+
+    /**
+     * 歌词高亮的模式 正常高亮模式
+     */
+    private int MODE_HIGH_LIGHT_NORMAL = 0;
+    /**
+     * 歌词高亮的模式 卡拉OK模式
+     */
+    private int MODE_HIGH_LIGHT_KARAOKE = 1;
+
+    /**
+     * 歌词高亮的模式   卡拉OK模式和正常高亮模式
+     */
+    private int mode = MODE_HIGH_LIGHT_KARAOKE;
+
 
     public LrcView(Context context, AttributeSet attr) {
         super(context, attr);
@@ -157,13 +178,17 @@ public class LrcView extends View implements ILrcView {
          *	第2步：画出正在播放的那句歌词的上面可以展示出来的歌词
          *	第3步：画出正在播放的那句歌词的下面的可以展示出来的歌词
          */
+
         // 1、 高亮地画出正在要高亮的的那句歌词
-        String highlightText = mLrcRows.get(mHighLightRow).content;
         int highlightRowY = height / 2 - mLrcFontSize;
-        mPaint.setColor(mHighLightRowColor);
-        mPaint.setTextSize(mLrcFontSize);
-        mPaint.setTextAlign(Align.CENTER);
-        canvas.drawText(highlightText, rowX, highlightRowY, mPaint);
+
+        if (mode == MODE_HIGH_LIGHT_KARAOKE){
+            // 卡拉OK模式 逐字高亮
+            drawKaraokeHighLightLrcRow(canvas, width, rowX, highlightRowY);
+        } else {
+            // 正常高亮
+            drawHighLrcRow(canvas, height, rowX, highlightRowY);
+        }
 
         // 上下拖动歌词的时候 画出拖动要高亮的那句歌词的时间 和 高亮的那句歌词下面的一条直线
         if (mDisplayMode == DISPLAY_MODE_SEEK) {
@@ -176,7 +201,7 @@ public class LrcView extends View implements ILrcView {
             mPaint.setColor(mSeekLineTextColor);
             mPaint.setTextSize(mSeekLineTextSize);
             mPaint.setTextAlign(Align.LEFT);
-            canvas.drawText(mLrcRows.get(mHighLightRow).strTime, 0, highlightRowY, mPaint);
+            canvas.drawText(mLrcRows.get(mHighLightRow).startTimeString, 0, highlightRowY, mPaint);
         }
 
         // 2、画出正在播放的那句歌词的上面可以展示出来的歌词
@@ -192,12 +217,12 @@ public class LrcView extends View implements ILrcView {
 //        }
 
         //画出正在播放的那句歌词的上面所有的歌词
-		while( rowY > -mLrcFontSize && rowNum >= 0){
-			String text = mLrcRows.get(rowNum).content;
-			canvas.drawText(text, rowX, rowY, mPaint);
-			rowY -=  (mPaddingY + mLrcFontSize);
-			rowNum --;
-		}
+        while (rowY > -mLrcFontSize && rowNum >= 0) {
+            String text = mLrcRows.get(rowNum).content;
+            canvas.drawText(text, rowX, rowY, mPaint);
+            rowY -= (mPaddingY + mLrcFontSize);
+            rowNum--;
+        }
 
         // 3、画出正在播放的那句歌词的下面的可以展示出来的歌词
         rowNum = mHighLightRow + 1;
@@ -209,14 +234,49 @@ public class LrcView extends View implements ILrcView {
 //            canvas.drawText(text2, rowX, rowY, mPaint);
 //        }
 
-		//画出正在播放的那句歌词的所有下面的可以展示出来的歌词
-		while( rowY < height && rowNum < mLrcRows.size()){
-			String text = mLrcRows.get(rowNum).content;
-			canvas.drawText(text, rowX, rowY, mPaint);
-			rowY += (mPaddingY + mLrcFontSize);
-			rowNum ++;
-		}
+        //画出正在播放的那句歌词的所有下面的可以展示出来的歌词
+        while (rowY < height && rowNum < mLrcRows.size()) {
+            String text = mLrcRows.get(rowNum).content;
+            canvas.drawText(text, rowX, rowY, mPaint);
+            rowY += (mPaddingY + mLrcFontSize);
+            rowNum++;
+        }
 
+    }
+
+    private void drawKaraokeHighLightLrcRow(Canvas canvas, int width, int rowX, int highlightRowY) {
+        LrcRow highLrcRow = mLrcRows.get(mHighLightRow);
+        String highlightText = highLrcRow.content;
+
+        // 先画一层普通颜色的
+        mPaint.setColor(mNormalRowColor);
+        mPaint.setTextSize(mLrcFontSize);
+        mPaint.setTextAlign(Align.CENTER);
+        canvas.drawText(highlightText, rowX, highlightRowY, mPaint);
+
+        // 再画一层高亮颜色的
+        int highLineWidth = (int) mPaint.measureText(highlightText);
+        int leftOffset = (width - highLineWidth) / 2;
+        long start = highLrcRow.getStartTime();
+        long end = highLrcRow.getEndTime();
+        // 高亮的宽度
+        int highWidth = (int) ((currentMillis - start) * 1.0f / (end - start) * highLineWidth);
+        if (highWidth > 0) {
+            //画一个 高亮的bitmap
+            mPaint.setColor(mHighLightRowColor);
+            Bitmap textBitmap = Bitmap.createBitmap(highWidth, highlightRowY + mPaddingY, Bitmap.Config.ARGB_8888);
+            Canvas textCanvas = new Canvas(textBitmap);
+            textCanvas.drawText(highlightText, highLineWidth / 2, highlightRowY, mPaint);
+            canvas.drawBitmap(textBitmap, leftOffset, 0, mPaint);
+        }
+    }
+
+    private void drawHighLrcRow(Canvas canvas, int height, int rowX, int highlightRowY) {
+        String highlightText = mLrcRows.get(mHighLightRow).content;
+        mPaint.setColor(mHighLightRowColor);
+        mPaint.setTextSize(mLrcFontSize);
+        mPaint.setTextAlign(Align.CENTER);
+        canvas.drawText(highlightText, rowX, highlightRowY, mPaint);
     }
 
     /**
@@ -432,6 +492,7 @@ public class LrcView extends View implements ILrcView {
 
     /**
      * 设置歌词行集合
+     *
      * @param lrcRows
      */
     public void setLrc(List<LrcRow> lrcRows) {
@@ -441,6 +502,7 @@ public class LrcView extends View implements ILrcView {
 
     /**
      * 播放的时候调用该方法滚动歌词，高亮正在播放的那句歌词
+     *
      * @param time
      */
     public void seekLrcToTime(long time) {
@@ -450,6 +512,8 @@ public class LrcView extends View implements ILrcView {
         if (mDisplayMode != DISPLAY_MODE_NORMAL) {
             return;
         }
+
+        currentMillis = time;
         Log.d(TAG, "seekLrcToTime:" + time);
 
         for (int i = 0; i < mLrcRows.size(); i++) {
@@ -459,8 +523,8 @@ public class LrcView extends View implements ILrcView {
              *  正在播放的时间大于current行的歌词的时间而小于next行歌词的时间， 设置要高亮的行为current行
              *  正在播放的时间大于current行的歌词，而current行为最后一句歌词时，设置要高亮的行为current行
              */
-            if ((time >= current.time && next != null && time < next.time)
-                    || (time > current.time && next == null)){
+            if ((time >= current.startTime && next != null && time < next.startTime)
+                    || (time > current.startTime && next == null)) {
                 seekLrc(i, false);
                 return;
             }
