@@ -52,11 +52,11 @@ public class LrcView extends View implements ILrcView {
     /**
      * 当前高亮歌词的行数
      */
-    private int mHignlightRow = 0;
+    private int mHighLightRow = 0;
     /**
      * 当前高亮歌词的字体颜色为黄色
      */
-    private int mHignlightRowColor = Color.YELLOW;
+    private int mHighLightRowColor = Color.YELLOW;
     /**
      * 不高亮歌词的字体颜色为白色
      */
@@ -123,8 +123,8 @@ public class LrcView extends View implements ILrcView {
         mPaint.setTextSize(mLrcFontSize);
     }
 
-    public void setListener(ILrcViewListener l) {
-        mLrcViewListener = l;
+    public void setListener(ILrcViewListener listener) {
+        mLrcViewListener = listener;
     }
 
     public void setLoadingTipText(String text) {
@@ -139,7 +139,7 @@ public class LrcView extends View implements ILrcView {
         if (mLrcRows == null || mLrcRows.size() == 0) {
             if (mLoadingLrcTip != null) {
                 // draw tip when no lrc.
-                mPaint.setColor(mHignlightRowColor);
+                mPaint.setColor(mHighLightRowColor);
                 mPaint.setTextSize(mLrcFontSize);
                 mPaint.setTextAlign(Align.CENTER);
                 canvas.drawText(mLoadingLrcTip, width / 2, height / 2 - mLrcFontSize, mPaint);
@@ -158,9 +158,9 @@ public class LrcView extends View implements ILrcView {
          *	第3步：画出正在播放的那句歌词的下面的可以展示出来的歌词
          */
         // 1、 高亮地画出正在要高亮的的那句歌词
-        String highlightText = mLrcRows.get(mHignlightRow).content;
+        String highlightText = mLrcRows.get(mHighLightRow).content;
         int highlightRowY = height / 2 - mLrcFontSize;
-        mPaint.setColor(mHignlightRowColor);
+        mPaint.setColor(mHighLightRowColor);
         mPaint.setTextSize(mLrcFontSize);
         mPaint.setTextAlign(Align.CENTER);
         canvas.drawText(highlightText, rowX, highlightRowY, mPaint);
@@ -176,14 +176,14 @@ public class LrcView extends View implements ILrcView {
             mPaint.setColor(mSeekLineTextColor);
             mPaint.setTextSize(mSeekLineTextSize);
             mPaint.setTextAlign(Align.LEFT);
-            canvas.drawText(mLrcRows.get(mHignlightRow).strTime, 0, highlightRowY, mPaint);
+            canvas.drawText(mLrcRows.get(mHighLightRow).strTime, 0, highlightRowY, mPaint);
         }
 
         // 2、画出正在播放的那句歌词的上面可以展示出来的歌词
         mPaint.setColor(mNormalRowColor);
         mPaint.setTextSize(mLrcFontSize);
         mPaint.setTextAlign(Align.CENTER);
-        rowNum = mHignlightRow - 1;
+        rowNum = mHighLightRow - 1;
         rowY = highlightRowY - mPaddingY - mLrcFontSize;
         //只画出正在播放的那句歌词的上一句歌词
 //        if (rowY > -mLrcFontSize && rowNum >= 0) {
@@ -200,7 +200,7 @@ public class LrcView extends View implements ILrcView {
 		}
 
         // 3、画出正在播放的那句歌词的下面的可以展示出来的歌词
-        rowNum = mHignlightRow + 1;
+        rowNum = mHighLightRow + 1;
         rowY = highlightRowY + mPaddingY + mLrcFontSize;
 
         //只画出正在播放的那句歌词的下一句歌词
@@ -230,12 +230,12 @@ public class LrcView extends View implements ILrcView {
             return;
         }
         LrcRow lrcRow = mLrcRows.get(position);
-        mHignlightRow = position;
+        mHighLightRow = position;
         invalidate();
         //如果是手指拖动歌词后
         if (mLrcViewListener != null && cb) {
             //回调onLrcSeeked方法，将音乐播放器播放的位置移动到高亮歌词的位置
-            mLrcViewListener.onLrcSeeked(position, lrcRow);
+            mLrcViewListener.onLrcSought(position, lrcRow);
         }
     }
 
@@ -289,7 +289,7 @@ public class LrcView extends View implements ILrcView {
             case MotionEvent.ACTION_UP:
                 if (mDisplayMode == DISPLAY_MODE_SEEK) {
                     //高亮手指抬起时的歌词并播放从该句歌词开始播放
-                    seekLrc(mHignlightRow, true);
+                    seekLrc(mHighLightRow, true);
                 }
                 mDisplayMode = DISPLAY_MODE_NORMAL;
                 invalidate();
@@ -342,19 +342,19 @@ public class LrcView extends View implements ILrcView {
         mDisplayMode = DISPLAY_MODE_SEEK;
         int rowOffset = Math.abs((int) offsetY / mLrcFontSize); //歌词要滚动的行数
 
-        Log.d(TAG, "move to new hightlightrow : " + mHignlightRow + " offsetY: " + offsetY + " rowOffset:" + rowOffset);
+        Log.d(TAG, "move to new hightlightrow : " + mHighLightRow + " offsetY: " + offsetY + " rowOffset:" + rowOffset);
 
         if (offsetY < 0) {
             //手指向上移动，歌词向下滚动
-            mHignlightRow += rowOffset;//设置要高亮的歌词为 当前高亮歌词 向下滚动rowOffset行后的歌词
+            mHighLightRow += rowOffset;//设置要高亮的歌词为 当前高亮歌词 向下滚动rowOffset行后的歌词
         } else if (offsetY > 0) {
             //手指向下移动，歌词向上滚动
-            mHignlightRow -= rowOffset;//设置要高亮的歌词为 当前高亮歌词 向上滚动rowOffset行后的歌词
+            mHighLightRow -= rowOffset;//设置要高亮的歌词为 当前高亮歌词 向上滚动rowOffset行后的歌词
         }
-        //设置要高亮的歌词为0和mHignlightRow中的较大值，即如果mHignlightRow < 0，mHignlightRow=0
-        mHignlightRow = Math.max(0, mHignlightRow);
-        //设置要高亮的歌词为0和mHignlightRow中的较小值，即如果mHignlight > RowmLrcRows.size()-1，mHignlightRow=mLrcRows.size()-1
-        mHignlightRow = Math.min(mHignlightRow, mLrcRows.size() - 1);
+        //设置要高亮的歌词为0和mHignlightRow中的较大值，即如果mHignlightRow < 0，mHighLightRow=0
+        mHighLightRow = Math.max(0, mHighLightRow);
+        //设置要高亮的歌词为0和mHignlightRow中的较小值，即如果mHignlight > RowmLrcRows.size()-1，mHighLightRow=mLrcRows.size()-1
+        mHighLightRow = Math.min(mHighLightRow, mLrcRows.size() - 1);
         //如果歌词要滚动的行数大于0，则重画LrcView
         if (rowOffset > 0) {
             mLastMotionY = y;
@@ -399,31 +399,31 @@ public class LrcView extends View implements ILrcView {
 
         float maxOffset = 0; // max offset between x or y axis,used to decide scale size
 
-        boolean zoomin = false;
+        boolean zooMin = false;
         //第一次双指之间的x坐标的差距
         float oldXOffset = Math.abs(mPointerOneLastMotion.x - mPointerTwoLastMotion.x);
         //第二次双指之间的x坐标的差距
-        float newXoffset = Math.abs(x1 - x0);
+        float newXOffset = Math.abs(x1 - x0);
 
         //第一次双指之间的y坐标的差距
         float oldYOffset = Math.abs(mPointerOneLastMotion.y - mPointerTwoLastMotion.y);
         //第二次双指之间的y坐标的差距
-        float newYoffset = Math.abs(y1 - y0);
+        float newYOffset = Math.abs(y1 - y0);
 
         //双指移动之后，判断双指之间移动的最大差距
-        maxOffset = Math.max(Math.abs(newXoffset - oldXOffset), Math.abs(newYoffset - oldYOffset));
+        maxOffset = Math.max(Math.abs(newXOffset - oldXOffset), Math.abs(newYOffset - oldYOffset));
         //如果x坐标移动的多一些
-        if (maxOffset == Math.abs(newXoffset - oldXOffset)) {
+        if (maxOffset == Math.abs(newXOffset - oldXOffset)) {
             //如果第二次双指之间的x坐标的差距大于第一次双指之间的x坐标的差距则是放大，反之则缩小
-            zoomin = newXoffset > oldXOffset ? true : false;
+            zooMin = newXOffset > oldXOffset ? true : false;
         }
         //如果y坐标移动的多一些
         else {
             //如果第二次双指之间的y坐标的差距大于第一次双指之间的y坐标的差距则是放大，反之则缩小
-            zoomin = newYoffset > oldYOffset ? true : false;
+            zooMin = newYOffset > oldYOffset ? true : false;
         }
         Log.d(TAG, "scaleSize maxOffset:" + maxOffset);
-        if (zoomin) {
+        if (zooMin) {
             return (int) (maxOffset / 10);//放大双指之间移动的最大差距的1/10
         } else {
             return -(int) (maxOffset / 10);//缩小双指之间移动的最大差距的1/10
