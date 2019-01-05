@@ -3,6 +3,9 @@
 
 >版权声明：本文为【欧阳鹏】原创文章，欢迎转载，转载请注明出处! 【http://blog.csdn.net/ouyang_peng/article/details/50813419】
 
+要了解具体实现过程，请查看博客
+
++ [【我的Android进阶之旅------>Android自定义View来实现解析lrc歌词并同步滚动、上下拖动、缩放歌词的功能】](http://blog.csdn.net/ouyang_peng/article/details/50813419)
 
 # 效果图
 
@@ -36,13 +39,13 @@
 
 图8、卡拉OK模式 逐字高亮歌词1
 
-![](https://github.com/ouyangpeng/android-lrc-view-oyp/blob/master/screenshot/a8.jpg)
+![](https://github.com/ouyangpeng/android-lrc-view-oyp/blob/master/screenshot/a8.png)
 
 
 图9、卡拉OK模式 逐字高亮歌词2
 
-![](https://github.com/ouyangpeng/android-lrc-view-oyp/blob/master/screenshot/a9.jpg)
+![](https://github.com/ouyangpeng/android-lrc-view-oyp/blob/master/screenshot/a9.png)
 
-图9、卡拉OK模式 逐字高亮歌词  动画
+图10、卡拉OK模式 逐字高亮歌词  动画
 
 ![](https://github.com/ouyangpeng/android-lrc-view-oyp/blob/master/screenshot/a10.gif)
